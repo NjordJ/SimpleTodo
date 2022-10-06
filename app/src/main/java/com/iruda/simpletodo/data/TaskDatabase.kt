@@ -26,8 +26,8 @@ abstract class TaskDatabase: RoomDatabase() {
 
             applicationScore.launch {
                 dao.insert(Task("Buy food"))
-                dao.insert(Task("View mail", important = true))
                 dao.insert(Task("Read a book", completed = true))
+                dao.insert(Task("View mail", important = true))
                 dao.insert(Task("Hang out with friends", completed = true))
             }
         }
