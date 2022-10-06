@@ -4,6 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Coding/Projects/Kotlin/SimpleTodo/app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="..\:/Coding/Projects/Kotlin/SimpleTodo/app/src/main/res/layout/fragment_add_edit_task.xml" value="0.20512820512820512" />
+        <entry key="..\:/Coding/Projects/Kotlin/SimpleTodo/app/src/main/res/layout/fragment_tasks.xml" value="0.25" />
+        <entry key="..\:/Coding/Projects/Kotlin/SimpleTodo/app/src/main/res/layout/item_task.xml" value="0.6" />
       </map>
     </option>
   </component>
