@@ -1,7 +1,6 @@
 package com.iruda.simpletodo.data
 
 import androidx.room.*
-import com.iruda.simpletodo.ui.tasks.SortOrder
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -8,11 +8,15 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.iruda.simpletodo.R
+import com.iruda.simpletodo.data.SortOrder
 import com.iruda.simpletodo.databinding.FragmentTasksBinding
 import com.iruda.simpletodo.util.onQueryTextChanged
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class TasksFragment : Fragment(), MenuProvider {
@@ -62,8 +66,14 @@ class TasksFragment : Fragment(), MenuProvider {
 
         val searchItem = menu.findItem(R.id.search_action_appbar)
         val searchView = searchItem.actionView as SearchView
+
         searchView.onQueryTextChanged {
             viewModel.searchQuery.value = it
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            menu.findItem(R.id.hide_completed_tasks_action_appbar).isChecked =
+                viewModel.preferencesFlow.first().hideCompleted
         }
     }
 
@@ -71,16 +81,16 @@ class TasksFragment : Fragment(), MenuProvider {
         // Handle the menu selection
         return when (menuItem.itemId) {
             R.id.sort_by_name_action_appbar -> {
-                viewModel.sortOrder.value = SortOrder.BY_NAME
+                viewModel.onSortOrderSelected(SortOrder.BY_NAME)
                 true
             }
             R.id.sort_by_date_action_appbar -> {
-                viewModel.sortOrder.value = SortOrder.BY_DATE
+                viewModel.onSortOrderSelected(SortOrder.BY_DATE)
                 true
             }
             R.id.hide_completed_tasks_action_appbar -> {
                 menuItem.isChecked = !menuItem.isChecked
-                viewModel.hideCompleted.value = menuItem.isChecked
+                viewModel.onHideCompletedClick(menuItem.isChecked)
                 true
             }
             R.id.delete_all_completed_tasks_action_appbar -> {
