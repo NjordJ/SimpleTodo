@@ -70,20 +70,17 @@ class TasksFragment : Fragment(), MenuProvider {
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         // Handle the menu selection
         return when (menuItem.itemId) {
-            R.id.search_action_appbar -> {
-
-                true
-            }
             R.id.sort_by_name_action_appbar -> {
-
+                viewModel.sortOrder.value = SortOrder.BY_NAME
                 true
             }
             R.id.sort_by_date_action_appbar -> {
-
+                viewModel.sortOrder.value = SortOrder.BY_DATE
                 true
             }
             R.id.hide_completed_tasks_action_appbar -> {
                 menuItem.isChecked = !menuItem.isChecked
+                viewModel.hideCompleted.value = menuItem.isChecked
                 true
             }
             R.id.delete_all_completed_tasks_action_appbar -> {
