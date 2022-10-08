@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.iruda.simpletodo.R
 import com.iruda.simpletodo.data.SortOrder
+import com.iruda.simpletodo.data.Task
 import com.iruda.simpletodo.databinding.FragmentTasksBinding
 import com.iruda.simpletodo.util.onQueryTextChanged
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,7 +20,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class TasksFragment : Fragment(), MenuProvider {
+class TasksFragment : Fragment(), MenuProvider, TasksAdapter.OnItemClickListener {
     private var _binding: FragmentTasksBinding? = null
 
     // This property is only valid between onCreateView and
@@ -45,7 +46,7 @@ class TasksFragment : Fragment(), MenuProvider {
 
         val binding = FragmentTasksBinding.bind(view)
 
-        val tasksAdapter = TasksAdapter()
+        val tasksAdapter = TasksAdapter(this)
 
         binding.apply {
             recyclerViewTasks.apply {
@@ -58,6 +59,14 @@ class TasksFragment : Fragment(), MenuProvider {
         viewModel.tasks.observe(viewLifecycleOwner) {
             tasksAdapter.submitList(it)
         }
+    }
+
+    override fun onItemClick(task: Task) {
+        viewModel.onTaskSelected(task)
+    }
+
+    override fun onCheckBoxClick(task: Task, isChecked: Boolean) {
+        viewModel.onTaskCheckedChanged(task, isChecked)
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
