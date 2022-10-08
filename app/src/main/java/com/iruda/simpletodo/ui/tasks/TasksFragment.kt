@@ -10,6 +10,7 @@ import androidx.fragment.app.createViewModelLazy
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +19,7 @@ import com.iruda.simpletodo.R
 import com.iruda.simpletodo.data.SortOrder
 import com.iruda.simpletodo.data.Task
 import com.iruda.simpletodo.databinding.FragmentTasksBinding
+import com.iruda.simpletodo.util.exhaustive
 import com.iruda.simpletodo.util.onQueryTextChanged
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -76,6 +78,10 @@ class TasksFragment : Fragment(), MenuProvider, TasksAdapter.OnItemClickListener
                     viewModel.onTaskSwiped(task)
                 }
             }).attachToRecyclerView(recyclerViewTasks)
+
+            fabAddTask.setOnClickListener {
+                viewModel.onAddNewTaskClick()
+            }
         }
 
         viewModel.tasks.observe(viewLifecycleOwner) {
@@ -91,7 +97,15 @@ class TasksFragment : Fragment(), MenuProvider, TasksAdapter.OnItemClickListener
                               viewModel.onUndoDeleteClick(event.task)
                           }.show()
                     }
-                }
+                    is TasksViewModel.TasksEvent.NavigateToAddTaskScreen -> {
+                        val action = TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment("New Task", null)
+                        findNavController().navigate(action)
+                    }
+                    is TasksViewModel.TasksEvent.NavigateToEditTaskScreen -> {
+                        val action = TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment("Edit Task", event.task)
+                        findNavController().navigate(action)
+                    }
+                }.exhaustive
             }
         }
     }
