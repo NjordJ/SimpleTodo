@@ -6,16 +6,21 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.createViewModelLazy
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.iruda.simpletodo.R
 import com.iruda.simpletodo.data.SortOrder
 import com.iruda.simpletodo.data.Task
 import com.iruda.simpletodo.databinding.FragmentTasksBinding
 import com.iruda.simpletodo.util.onQueryTextChanged
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -54,10 +59,40 @@ class TasksFragment : Fragment(), MenuProvider, TasksAdapter.OnItemClickListener
                 layoutManager = LinearLayoutManager(requireContext())
                 setHasFixedSize(true)
             }
+
+            ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0,
+            ItemTouchHelper.RIGHT)
+            {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+                    return false
+                }
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    val task = tasksAdapter.currentList[viewHolder.adapterPosition]
+                    viewModel.onTaskSwiped(task)
+                }
+            }).attachToRecyclerView(recyclerViewTasks)
         }
 
         viewModel.tasks.observe(viewLifecycleOwner) {
             tasksAdapter.submitList(it)
+        }
+
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.tasksEvent.collect { event ->
+                when(event) {
+                    is TasksViewModel.TasksEvent.ShowUndoDeleteTaskMessage -> {
+                      Snackbar.make(requireView(), "Task deleted", Snackbar.LENGTH_LONG)
+                          .setAction("UNDO") {
+                              viewModel.onUndoDeleteClick(event.task)
+                          }.show()
+                    }
+                }
+            }
         }
     }
 
