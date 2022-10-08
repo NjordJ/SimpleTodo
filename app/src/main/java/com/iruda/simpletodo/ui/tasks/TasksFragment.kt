@@ -37,6 +37,8 @@ class TasksFragment : Fragment(), MenuProvider, TasksAdapter.OnItemClickListener
 
     private val viewModel: TasksViewModel by viewModels()
 
+    private lateinit var searchView: SearchView
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -136,7 +138,13 @@ class TasksFragment : Fragment(), MenuProvider, TasksAdapter.OnItemClickListener
         menuInflater.inflate(R.menu.menu_fragment_tasks, menu)
 
         val searchItem = menu.findItem(R.id.search_action_appbar)
-        val searchView = searchItem.actionView as SearchView
+        searchView = searchItem.actionView as SearchView
+
+        val pendingQuery = viewModel.searchQuery.value
+        if (pendingQuery != null && pendingQuery.isNotEmpty()) {
+            searchItem.expandActionView()
+            searchView.setQuery(pendingQuery, false)
+        }
 
         searchView.onQueryTextChanged {
             viewModel.searchQuery.value = it
@@ -174,6 +182,7 @@ class TasksFragment : Fragment(), MenuProvider, TasksAdapter.OnItemClickListener
 
     override fun onDestroyView() {
         super.onDestroyView()
+        searchView.setOnQueryTextListener(null)
         _binding = null
     }
 }
